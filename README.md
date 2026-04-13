@@ -1,145 +1,71 @@
-# Projeto LDW - Backend Biblioteca
+Projeto LDW - Backend Biblioteca
+Esta é uma API REST desenvolvida para o gerenciamento de bibliotecas, utilizando o ecossistema Python moderno para integrar autores, livros, membros e empréstimos.
 
-API REST para gerenciamento de biblioteca usando Flask, Flasgger e PostgreSQL.
+Tecnologias Utilizadas
+Linguagem: Python 3.14+
 
-## Objetivo
+Gerenciador de Pacotes: uv
 
-Backend com 4 modulos (authors, books, members e loans), cada um com GET, POST, PUT e DELETE, documentado no Swagger.
+Framework Web: Flask e Flask-SQLAlchemy
 
-## Tecnologias
+Documentação: Flasgger (Swagger UI)
 
-- Python 3.14+
-- uv
-- Flask
-- Flasgger
-- Flask-SQLAlchemy
-- PostgreSQL
-- Docker Compose
+Banco de Dados: PostgreSQL
 
-## Estrutura principal
+Containerização: Docker Compose
 
-- apps/backend/main.py (ponto de entrada da API)
-- apps/backend/src/models.py (modelos do banco)
-- apps/backend/src/routes/ (blueprints)
-- apps/backend/src/db/seed.sql (dados iniciais)
-- apps/backend/docker-compose.yml (PostgreSQL)
+Estrutura do Projeto
+apps/backend/main.py: Ponto de entrada da aplicação.
 
-## Pre-requisitos
+apps/backend/src/models.py: Definição das entidades do banco de dados.
 
-- Python 3.14+
-- uv instalado
-- Docker Desktop ativo
-- CMD (Prompt de Comando)
+apps/backend/src/routes/: Blueprints para organização das rotas.
 
-## Execucao no CMD
+apps/backend/src/db/seed.sql: Script para carga inicial de dados.
 
-Rode os comandos abaixo no CMD.
+apps/backend/docker-compose.yml: Configuração do banco de dados.
 
-### 1. Entrar na pasta do projeto
+Guia de Instalação e Configuração
+Execute os comandos abaixo via Prompt de Comando (CMD).
 
-cd ldw-merge-skills-atv
+1. Preparação do Diretório
+Acesse a pasta do projeto e o diretório do backend:
 
-### 2. Entrar no backend
+DOS
+cd ldw-merge-skills-atv\apps\backend
+2. Configuração de Ambiente
+Crie o arquivo de configuração a partir do modelo disponível:
 
-cd apps\backend
-
-### 3. Criar arquivo .env
-
+DOS
 copy .env.example .env
+3. Gerenciamento do Banco de Dados
+Certifique-se de que o Docker está em execução e suba o serviço do PostgreSQL:
 
-### 4. Subir o banco
-
+DOS
 docker compose up -d
+As credenciais padrão são host localhost, porta 5432, usuário e senha postgres.
 
-Banco padrao:
-- host: localhost
-- porta: 5432
-- database: library_db
-- usuario: postgres
-- senha: postgres
+4. Instalação e Execução
+Utilize o uv para sincronizar dependências e iniciar o servidor:
 
-### 5. Instalar dependencias
-
+DOS
 uv sync --project .
-
-### 6. Iniciar a API
-
 uv run --project . python main.py
+Endereços de Acesso
+API Base: http://localhost:5000/api
 
-URLs:
-- API: http://localhost:5000
-- Swagger: http://localhost:5000/docs/
-- Health: http://localhost:5000/health
+Documentação Swagger: http://localhost:5000/docs/
 
-## Seed SQL
+Verificação de Status (Health): http://localhost:5000/health
 
-Depois da primeira subida da API (para criar tabelas), aplique o seed.
+Carga de Dados (Seed)
+Após a primeira execução da API (necessária para a criação automática das tabelas), execute o comando abaixo para inserir os dados iniciais:
 
+DOS
 docker exec -i library_postgres psql -U postgres -d library_db < src\db\seed.sql
+Resolução de Problemas
+Arquivo não encontrado (can't open file): Verifique se o comando está sendo executado dentro do diretório apps\backend.
 
-## Endpoints
+Porta 5432 ocupada: Encerre instâncias locais do PostgreSQL ou altere a porta mapeada no arquivo docker-compose.yml.
 
-Base URL: http://localhost:5000/api
-
-- Authors: GET/POST /authors, PUT/DELETE /authors/{id}
-- Books: GET/POST /books, PUT/DELETE /books/{id}
-- Members: GET/POST /members, PUT/DELETE /members/{id}
-- Loans: GET/POST /loans, PUT/DELETE /loans/{id}
-
-## Exemplo rapido
-
-Criar autor:
-
-POST /api/authors
-Content-Type: application/json
-
-{
-  "name": "Jorge Amado",
-  "bio": "Autor baiano"
-}
-
-Criar livro:
-
-POST /api/books
-Content-Type: application/json
-
-{
-  "title": "Capitaes da Areia",
-  "isbn": "9788501000011",
-  "available_copies": 5,
-  "author_id": 1
-}
-
-## Troubleshooting
-
-### Erro: can't open file
-
-Cause: comando executado um nivel acima da pasta do projeto.
-
-Correcao no CMD:
-
-cd C:\Users\seuusuario\pasta\ldw-merge-skills-atv
-uv run --project .\apps\backend python .\apps\backend\main.py
-
-### Porta 5432 ocupada
-
-Pare outro PostgreSQL local ou altere a porta no docker-compose.
-
-### API nao inicia
-
-Verifique se o container do banco esta rodando:
-
-docker ps
-
-## Comandos uteis
-
-Parar API: Ctrl + C no terminal da API.
-
-Parar banco:
-
-docker compose down
-
-Recriar banco do zero (remove dados):
-
-docker compose down -v
-docker compose up -d
+Reset do ambiente: Para remover o banco de dados e todos os dados armazenados, utilize o comando docker compose down -v.
