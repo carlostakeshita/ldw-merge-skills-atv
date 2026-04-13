@@ -1,117 +1,145 @@
-# Flask API com Flasgger
+# Projeto LDW - Backend Biblioteca
 
-API RESTful com Flask e Flasgger para documentação automática.
+API REST para gerenciamento de biblioteca usando Flask, Flasgger e PostgreSQL.
 
-## Requisitos
+## Objetivo
 
-- Python 3.11+
-- Docker e Docker Compose
+Backend com 4 modulos (authors, books, members e loans), cada um com GET, POST, PUT e DELETE, documentado no Swagger.
 
-## Como Rodar
+## Tecnologias
 
-### Opção 1: Docker Compose (Recomendado)
+- Python 3.14+
+- uv
+- Flask
+- Flasgger
+- Flask-SQLAlchemy
+- PostgreSQL
+- Docker Compose
 
-```bash
-# Iniciar os serviços
-docker-compose up --build
+## Estrutura principal
 
-# Acessar a aplicação
-# http://localhost:5000
+- apps/backend/main.py (ponto de entrada da API)
+- apps/backend/src/models.py (modelos do banco)
+- apps/backend/src/routes/ (blueprints)
+- apps/backend/src/db/seed.sql (dados iniciais)
+- apps/backend/docker-compose.yml (PostgreSQL)
 
-# Documentação da API (Swagger UI)
-# http://localhost:5000/apidocs
-```
+## Pre-requisitos
 
-### Opção 2: Execução Local
+- Python 3.14+
+- uv instalado
+- Docker Desktop ativo
+- CMD (Prompt de Comando)
 
-```bash
-# Criar ambiente virtual
-python -m venv venv
-source venv/bin/activate  # Linux/Mac
-# ou
-venv\Scripts\activate  # Windows
+## Execucao no CMD
 
-# Instalar dependências
-pip install -r requirements.txt
+Rode os comandos abaixo no CMD.
 
-# Iniciar PostgreSQL com Docker
-docker run -d -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=flaskdb -p 5432:5432 postgres:15-alpine
+### 1. Entrar na pasta do projeto
 
-# Criar migrations
-flask db init
-flask db migrate -m "Initial migration"
-flask db upgrade
+cd ldw-merge-skills-atv
 
-#popular banco com dados iniciais
-python seed.py
+### 2. Entrar no backend
 
-# Iniciar servidor
-python run.py
-```
+cd apps\backend
 
-## Endpoints da API
+### 3. Criar arquivo .env
 
-### Categories
-| Método | Endpoint | Descrição |
-|--------|----------|------------|
-| GET | `/api/categories` | Listar todas |
-| POST | `/api/categories` | Criar nova |
-| PUT | `/api/categories/<id>` | Atualizar |
-| DELETE | `/api/categories/<id>` | Deletar |
+copy .env.example .env
 
-### Products
-| Método | Endpoint | Descrição |
-|--------|----------|------------|
-| GET | `/api/products` | Listar todos |
-| POST | `/api/products` | Criar novo |
-| PUT | `/api/products/<id>` | Atualizar |
-| DELETE | `/api/products/<id>` | Deletar |
+### 4. Subir o banco
 
-### Clients
-| Método | Endpoint | Descrição |
-|--------|----------|------------|
-| GET | `/api/clients` | Listar todos |
-| POST | `/api/clients` | Criar novo |
-| PUT | `/api/clients/<id>` | Atualizar |
-| DELETE | `/api/clients/<id>` | Deletar |
+docker compose up -d
 
-### Orders
-| Método | Endpoint | Descrição |
-|--------|----------|------------|
-| GET | `/api/orders` | Listar todos |
-| POST | `/api/orders` | Criar novo |
-| PUT | `/api/orders/<id>` | Atualizar |
-| DELETE | `/api/orders/<id>` | Deletar |
+Banco padrao:
+- host: localhost
+- porta: 5432
+- database: library_db
+- usuario: postgres
+- senha: postgres
 
-## Variáveis de Ambiente
+### 5. Instalar dependencias
 
-| Variável | Valor Padrão | Descrição |
-|----------|--------------|------------|
-| `DATABASE_URL` | `postgresql://postgres:postgres@localhost:5432/flaskdb` | String de conexão |
-| `SECRET_KEY` | `dev-secret-key` | Chave secreta |
+uv sync --project .
 
-## Documentação
+### 6. Iniciar a API
 
-A documentação Swagger está disponível em: `http://localhost:5000/apidocs`
+uv run --project . python main.py
 
-## Estrutura do Projeto
+URLs:
+- API: http://localhost:5000
+- Swagger: http://localhost:5000/docs/
+- Health: http://localhost:5000/health
 
-```
-.
-├── app/
-│   ├── __init__.py      # App factory
-│   ├── blueprints/      # Blueprints (routes)
-│   │   ├── categories.py
-│   │   ├── products.py
-│   │   ├── clients.py
-│   │   └── orders.py
-│   └── models/          # Modelos SQLAlchemy
-│       └── __init__.py
-├── config.py            # Configurações
-├── run.py              # Entry point
-├── seed.py             # Dados iniciais
-├── requirements.txt    # Dependências
-├── Dockerfile
-├── docker-compose.yml
-└── README.md
-```
+## Seed SQL
+
+Depois da primeira subida da API (para criar tabelas), aplique o seed.
+
+docker exec -i library_postgres psql -U postgres -d library_db < src\db\seed.sql
+
+## Endpoints
+
+Base URL: http://localhost:5000/api
+
+- Authors: GET/POST /authors, PUT/DELETE /authors/{id}
+- Books: GET/POST /books, PUT/DELETE /books/{id}
+- Members: GET/POST /members, PUT/DELETE /members/{id}
+- Loans: GET/POST /loans, PUT/DELETE /loans/{id}
+
+## Exemplo rapido
+
+Criar autor:
+
+POST /api/authors
+Content-Type: application/json
+
+{
+  "name": "Jorge Amado",
+  "bio": "Autor baiano"
+}
+
+Criar livro:
+
+POST /api/books
+Content-Type: application/json
+
+{
+  "title": "Capitaes da Areia",
+  "isbn": "9788501000011",
+  "available_copies": 5,
+  "author_id": 1
+}
+
+## Troubleshooting
+
+### Erro: can't open file
+
+Cause: comando executado um nivel acima da pasta do projeto.
+
+Correcao no CMD:
+
+cd C:\Users\seuusuario\pasta\ldw-merge-skills-atv
+uv run --project .\apps\backend python .\apps\backend\main.py
+
+### Porta 5432 ocupada
+
+Pare outro PostgreSQL local ou altere a porta no docker-compose.
+
+### API nao inicia
+
+Verifique se o container do banco esta rodando:
+
+docker ps
+
+## Comandos uteis
+
+Parar API: Ctrl + C no terminal da API.
+
+Parar banco:
+
+docker compose down
+
+Recriar banco do zero (remove dados):
+
+docker compose down -v
+docker compose up -d

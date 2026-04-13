@@ -1,0 +1,18 @@
+[tool.uv]
+requires = ["python>=3.14"]
+
+[project]
+name = "backend"
+version = "0.1.0"
+description = "Flask API with Flasgger"
+requires-python = ">=3.14"
+dependencies = [
+    "flask>=3.0.0",
+    "flasgger>=0.9.7",
+    "flask-sqlalchemy>=3.1.0",
+    "psycopg2-binary>=2.9.0",
+    "python-dotenv>=1.0.0",
+]
+
+[tool.uv.scripts]
+main = "main:app"
