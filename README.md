@@ -1,77 +1,91 @@
-# LDW Library Backend API
+# Library Backend API - Flask + Flasgger
 
-Uma API REST completa para gerenciamento de biblioteca, construida com Flask, Flasgger e PostgreSQL.
+API REST completa para biblioteca: autores, livros, membros, emprestimos. CRUD + Swagger docs automaticos.
 
-## Objetivo
-
-Desenvolver um backend robusto com quatro modulos principais:
-- Autores (authors)
-- Livros (books) 
-- Membros (members)
-- Emprestimos (loans)
-
-Cada modulo suporta operacoes CRUD completas (GET, POST, PUT, DELETE), com documentacao automatica via Swagger UI.
-
-## Tecnologias Utilizadas
+## Requisitos
 
 - Python 3.14+
-- uv (gerenciador de pacotes/ambientes)
-- Flask (framework web)
-- Flasgger (documentacao Swagger)
-- Flask-SQLAlchemy (ORM para banco de dados)
-- PostgreSQL (banco de dados relacional)
-- Docker Compose (orquestracao de containers)
+- uv (instale: pip install uv ou https://uv.rs)
+- Docker Desktop ativo
+- Terminal: Prompt de Comando (CMD)
 
-## Estrutura do Projeto
+## Passo a Passo para Executar
 
-apps/
-└── backend/
-    ├── main.py (ponto de entrada)
-    ├── src/
-    │   ├── models.py (modelos SQLAlchemy)
-    │   ├── routes/ (blueprints dos endpoints)
-    │   └── db/
-    │       └── seed.sql (dados de exemplo)
-    ├── docker-compose.yml (PostgreSQL)
-    ├── pyproject.toml (dependencias uv)
+Abra CMD e execute:
 
-## Pre-requisitos
+1. Navegue ate backend:
+```
+cd apps\backend
+```
 
-- Python 3.14+
-- uv (pip install uv)
-- Docker Desktop
-- Prompt de Comando (CMD)
+2. Crie arquivo .env (copie exemplo se existir):
+```
+copy .env.example .env
+```
 
-## Instruções de Execução
+3. Inicie banco PostgreSQL:
+```
+docker compose up -d
+```
+Aguarde ~30s. Verifique:
+```
+docker ps
+```
+Veja container library_postgres rodando.
 
-No diretorio apps/backend:
+Credenciais DB:
+- Host: localhost
+- Porta: 5432
+- DB: library_db
+- User: postgres
+- Pass: postgres
 
-1. copy .env.example .env
+4. Instale pacotes:
+```
+uv sync
+```
 
-2. docker compose up -d
+5. Rode a API:
+```
+uv run python main.py
+```
 
-3. uv sync --project .
+API roda em http://localhost:5000
+- Docs Swagger: http://localhost:5000/docs/
+- Health check: http://localhost:5000/health
 
-4. uv run --project . python main.py
+Primeira execucao cria tabelas automaticamente.
 
-URLs:
-- API Base: http://localhost:5000
-- Swagger Docs: http://localhost:5000/docs/
-- Health Check: http://localhost:5000/health
+## Endpoints Base: /api
 
-## Endpoints
+Autores: GET/POST /authors   PUT/DELETE /authors/{id}
+Livros: GET/POST /books   PUT/DELETE /books/{id}
+Membros: GET/POST /members   PUT/DELETE /members/{id}
+Emprestimos: GET/POST /loans   PUT/DELETE /loans/{id}
 
-Base URL: http://localhost:5000/api
+Exemplo criar autor (PowerShell ou curl):
+```
+curl -X POST http://localhost:5000/api/authors -H "Content-Type: application/json" -d "{\"name\": \"Jorge Amado\", \"bio\": \"Escritor brasileiro\"}"
+```
 
-- Authors: GET/POST /authors, PUT/DELETE /authors/{id}
-- Books: GET/POST /books, PUT/DELETE /books/{id}
-- Members: GET/POST /members, PUT/DELETE /members/{id}
-- Loans: GET/POST /loans, PUT/DELETE /loans/{id}
+## Dados de Exemplo (Seed)
 
-## Solução de Problemas
+```
+docker exec -i library_postgres psql -U postgres -d library_db < src\db\seed.sql
+```
 
-- Erro can't open file: verifique cd apps\backend
-- Porta 5432 em uso: pare outros Postgres ou altere docker-compose.yml
-- Verifique docker ps para container library_postgres
+## Parar Tudo
 
-Licenca: Projeto educacional/demonstracao.
+```
+Ctrl+C  (API)
+docker compose down  (DB)
+```
+
+## Problemas Comuns
+
+- "can't open file": Confirme cd apps\backend
+- Porta 5432 usada: docker compose down -v  ou mude porta no docker-compose.yml
+- uv nao encontrado: pip install uv
+- Docker nao roda: abra Docker Desktop primeiro
+
+Projeto educacional.
