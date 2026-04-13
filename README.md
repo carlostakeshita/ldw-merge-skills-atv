@@ -1,91 +1,137 @@
-# Library Backend API - Flask + Flasgger
+# Backend API Biblioteca
 
-API REST completa para biblioteca: autores, livros, membros, emprestimos. CRUD + Swagger docs automaticos.
+API REST para gerenciamento de biblioteca usando Flask, Flasgger e PostgreSQL.
 
-## Requisitos
+## Objetivo
+
+Sistema backend com modulos para authors, books, members e loans. Cada modulo tem endpoints GET, POST, PUT, DELETE totalmente documentados no Swagger.
+
+## Tecnologias usadas
 
 - Python 3.14+
-- uv (instale: pip install uv ou https://uv.rs)
-- Docker Desktop ativo
-- Terminal: Prompt de Comando (CMD)
+- uv (gerenciador rapido)
+- Flask (web framework)
+- Flasgger (Swagger docs)
+- Flask-SQLAlchemy (ORM)
+- PostgreSQL (banco)
+- Docker Compose (containers)
 
-## Passo a Passo para Executar
+## Estrutura dos arquivos
 
-Abra CMD e execute:
+- apps/backend/main.py : inicia a API
+- apps/backend/src/models.py : modelos do banco
+- apps/backend/src/routes/ : endpoints por modulo
+- apps/backend/src/db/seed.sql : dados de teste
+- apps/backend/docker-compose.yml : config Postgres
+- apps/backend/pyproject.toml : dependencias uv
 
-1. Navegue ate backend:
-```
+## Pre-requisitos antes de começar
+
+Instale e tenha pronto:
+Python 3.14+
+uv (pip install uv)
+Docker Desktop aberto
+Use CMD como terminal
+
+## Como executar - Passo a passo no CMD
+
+### Metodo 1: Entrando na pasta backend (recomendado)
+
+1. cd apps\backend
+
+2. copy .env.example .env   (cria config ambiente)
+
+3. docker compose up -d   (inicia Postgres)
+
+4. Aguarde Docker iniciar (veja docker ps)
+
+5. uv sync   (instala pacotes)
+
+6. uv run python main.py   (roda API)
+
+### Info do banco criado:
+host: localhost
+porta: 5432
+database: library_db
+usuario: postgres
+senha: postgres
+
+### URLs disponiveis:
+API base: http://localhost:5000
+Documentacao Swagger: http://localhost:5000/docs/
+Health check: http://localhost:5000/health
+
+### Metodo 2: Executando da pasta raiz
+
+Da 'Nova pasta (2)':
+
+uv sync --project apps/backend
+
+uv run --project apps/backend python apps/backend/main.py
+
+## Como popular com dados de teste (Seed)
+
+1. Rode API uma vez (cria tabelas)
+
+2. cd apps\backend
+
+3. docker exec -i library_postgres psql -U postgres -d library_db < src\db\seed.sql
+
+## Lista de endpoints
+
+Todos em http://localhost:5000/api
+
+Authors - GET/POST /authors , PUT/DELETE /authors/{id}
+Books - GET/POST /books , PUT/DELETE /books/{id}
+Members - GET/POST /members , PUT/DELETE /members/{id}
+Loans - GET/POST /loans , PUT/DELETE /loans/{id}
+
+## Exemplos de uso rapido
+
+Criar autor (use curl ou Postman):
+
+POST http://localhost:5000/api/authors
+Content-Type: application/json
+
+{
+  "name": "Jorge Amado",
+  "bio": "Autor baiano famoso"
+}
+
+Criar livro:
+
+POST http://localhost:5000/api/books
+{
+  "title": "Capitães da Areia",
+  "isbn": "9788501000011",
+  "available_copies": 5,
+  "author_id": 1
+}
+
+## Resolucao de problemas comuns
+
+Problema: Arquivo main.py nao encontrado
+Solucao: Certifique cd apps\backend antes do uv run python main.py
+
+Problema: Porta 5432 ja usada
+Solucao: docker compose down   ou feche outro Postgres local
+
+Problema: API nao sobe
+Verifique: docker ps  (container library_postgres deve estar up)
+
+## Comandos importantes do dia a dia
+
+Parar API: Ctrl + C no terminal
+
+Parar apenas banco:
 cd apps\backend
-```
+docker compose down
 
-2. Crie arquivo .env (copie exemplo se existir):
-```
-copy .env.example .env
-```
-
-3. Inicie banco PostgreSQL:
-```
+Limpar e recriar banco (perde dados):
+docker compose down -v
 docker compose up -d
-```
-Aguarde ~30s. Verifique:
-```
-docker ps
-```
-Veja container library_postgres rodando.
 
-Credenciais DB:
-- Host: localhost
-- Porta: 5432
-- DB: library_db
-- User: postgres
-- Pass: postgres
+Ver logs banco:
+docker compose logs
 
-4. Instale pacotes:
-```
-uv sync
-```
-
-5. Rode a API:
-```
-uv run python main.py
-```
-
-API roda em http://localhost:5000
-- Docs Swagger: http://localhost:5000/docs/
-- Health check: http://localhost:5000/health
-
-Primeira execucao cria tabelas automaticamente.
-
-## Endpoints Base: /api
-
-Autores: GET/POST /authors   PUT/DELETE /authors/{id}
-Livros: GET/POST /books   PUT/DELETE /books/{id}
-Membros: GET/POST /members   PUT/DELETE /members/{id}
-Emprestimos: GET/POST /loans   PUT/DELETE /loans/{id}
-
-Exemplo criar autor (PowerShell ou curl):
-```
-curl -X POST http://localhost:5000/api/authors -H "Content-Type: application/json" -d "{\"name\": \"Jorge Amado\", \"bio\": \"Escritor brasileiro\"}"
-```
-
-## Dados de Exemplo (Seed)
-
-```
-docker exec -i library_postgres psql -U postgres -d library_db < src\db\seed.sql
-```
-
-## Parar Tudo
-
-```
-Ctrl+C  (API)
-docker compose down  (DB)
-```
-
-## Problemas Comuns
-
-- "can't open file": Confirme cd apps\backend
-- Porta 5432 usada: docker compose down -v  ou mude porta no docker-compose.yml
-- uv nao encontrado: pip install uv
-- Docker nao roda: abra Docker Desktop primeiro
-
-Projeto educacional.
+Projeto para estudo e pratica de API Flask.
