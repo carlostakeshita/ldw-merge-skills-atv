@@ -1,12 +1,14 @@
 Projeto LDW - Backend Biblioteca
-Esta é uma API REST desenvolvida para o gerenciamento de bibliotecas, utilizando o ecossistema Python moderno para integrar autores, livros, membros e empréstimos.
+API REST para gerenciamento de biblioteca desenvolvida com Flask, Flasgger e PostgreSQL. O sistema está dividido em quatro módulos principais: autores (authors), livros (books), membros (members) e empréstimos (loans).
 
 Tecnologias Utilizadas
 Linguagem: Python 3.14+
 
 Gerenciador de Pacotes: uv
 
-Framework Web: Flask e Flask-SQLAlchemy
+Framework Web: Flask
+
+ORM: Flask-SQLAlchemy
 
 Documentação: Flasgger (Swagger UI)
 
@@ -14,58 +16,65 @@ Banco de Dados: PostgreSQL
 
 Containerização: Docker Compose
 
-Estrutura do Projeto
-apps/backend/main.py: Ponto de entrada da aplicação.
+Estrutura do Diretório
+apps/backend/main.py: Ponto de entrada da API.
 
-apps/backend/src/models.py: Definição das entidades do banco de dados.
+apps/backend/src/models.py: Modelos de dados do SQLAlchemy.
 
-apps/backend/src/routes/: Blueprints para organização das rotas.
+apps/backend/src/routes/: Blueprints contendo as rotas da aplicação.
 
-apps/backend/src/db/seed.sql: Script para carga inicial de dados.
+apps/backend/src/db/seed.sql: Script SQL para população inicial do banco.
 
-apps/backend/docker-compose.yml: Configuração do banco de dados.
+apps/backend/docker-compose.yml: Configuração do serviço PostgreSQL.
 
-Guia de Instalação e Configuração
-Execute os comandos abaixo via Prompt de Comando (CMD).
+Instruções para Execução (Windows/CMD)
+Siga os passos abaixo para configurar e iniciar o ambiente de desenvolvimento.
 
-1. Preparação do Diretório
-Acesse a pasta do projeto e o diretório do backend:
+1. Navegação
+Acesse a pasta do backend:
 
-DOS
 cd ldw-merge-skills-atv\apps\backend
-2. Configuração de Ambiente
-Crie o arquivo de configuração a partir do modelo disponível:
 
-DOS
+2. Configuração de Variáveis de Ambiente
+Crie o arquivo .env a partir do exemplo:
+
 copy .env.example .env
-3. Gerenciamento do Banco de Dados
-Certifique-se de que o Docker está em execução e suba o serviço do PostgreSQL:
 
-DOS
+3. Infraestrutura de Banco de Dados
+Inicie o container do PostgreSQL (requer Docker Desktop ativo):
+
 docker compose up -d
-As credenciais padrão são host localhost, porta 5432, usuário e senha postgres.
 
-4. Instalação e Execução
-Utilize o uv para sincronizar dependências e iniciar o servidor:
+Configurações padrão: Host localhost, Porta 5432, Base library_db, Usuário/Senha postgres.
 
-DOS
+4. Instalação e Inicialização
+Instale as dependências e rode a API utilizando o gerenciador uv:
+
 uv sync --project .
 uv run --project . python main.py
-Endereços de Acesso
-API Base: http://localhost:5000/api
 
-Documentação Swagger: http://localhost:5000/docs/
+Endpoints e Documentação
+Swagger UI: http://localhost:5000/docs/
 
-Verificação de Status (Health): http://localhost:5000/health
+API Base URL: http://localhost:5000/api
 
-Carga de Dados (Seed)
-Após a primeira execução da API (necessária para a criação automática das tabelas), execute o comando abaixo para inserir os dados iniciais:
+Health Check: http://localhost:5000/health
 
-DOS
+Carga de Dados Inicial (Seed)
+Após a primeira execução da API para criação das tabelas, utilize o comando abaixo para popular o banco:
+
 docker exec -i library_postgres psql -U postgres -d library_db < src\db\seed.sql
+
 Resolução de Problemas
-Arquivo não encontrado (can't open file): Verifique se o comando está sendo executado dentro do diretório apps\backend.
+Erro de arquivo não encontrado: Certifique-se de que o terminal está operando dentro da pasta apps\backend.
 
-Porta 5432 ocupada: Encerre instâncias locais do PostgreSQL ou altere a porta mapeada no arquivo docker-compose.yml.
+Conflito na porta 5432: Verifique se não há outra instância do PostgreSQL rodando localmente fora do Docker.
 
-Reset do ambiente: Para remover o banco de dados e todos os dados armazenados, utilize o comando docker compose down -v.
+Falha na conexão: Utilize docker ps para validar se o container library_postgres está com status "Up".
+
+Comandos de Manutenção
+Parar a API: Ctrl + C no terminal em execução.
+
+Parar o banco de dados: docker compose down
+
+Limpar volumes e resetar banco: docker compose down -v
