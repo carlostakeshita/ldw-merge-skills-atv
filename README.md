@@ -1,80 +1,77 @@
-Projeto LDW - Backend Biblioteca
-API REST para gerenciamento de biblioteca desenvolvida com Flask, Flasgger e PostgreSQL. O sistema está dividido em quatro módulos principais: autores (authors), livros (books), membros (members) e empréstimos (loans).
+# LDW Library Backend API
 
-Tecnologias Utilizadas
-Linguagem: Python 3.14+
+Uma API REST completa para gerenciamento de biblioteca, construida com Flask, Flasgger e PostgreSQL.
 
-Gerenciador de Pacotes: uv
+## Objetivo
 
-Framework Web: Flask
+Desenvolver um backend robusto com quatro modulos principais:
+- Autores (authors)
+- Livros (books) 
+- Membros (members)
+- Emprestimos (loans)
 
-ORM: Flask-SQLAlchemy
+Cada modulo suporta operacoes CRUD completas (GET, POST, PUT, DELETE), com documentacao automatica via Swagger UI.
 
-Documentação: Flasgger (Swagger UI)
+## Tecnologias Utilizadas
 
-Banco de Dados: PostgreSQL
+- Python 3.14+
+- uv (gerenciador de pacotes/ambientes)
+- Flask (framework web)
+- Flasgger (documentacao Swagger)
+- Flask-SQLAlchemy (ORM para banco de dados)
+- PostgreSQL (banco de dados relacional)
+- Docker Compose (orquestracao de containers)
 
-Containerização: Docker Compose
+## Estrutura do Projeto
 
-Estrutura do Diretório
-apps/backend/main.py: Ponto de entrada da API.
+apps/
+└── backend/
+    ├── main.py (ponto de entrada)
+    ├── src/
+    │   ├── models.py (modelos SQLAlchemy)
+    │   ├── routes/ (blueprints dos endpoints)
+    │   └── db/
+    │       └── seed.sql (dados de exemplo)
+    ├── docker-compose.yml (PostgreSQL)
+    ├── pyproject.toml (dependencias uv)
 
-apps/backend/src/models.py: Modelos de dados do SQLAlchemy.
+## Pre-requisitos
 
-apps/backend/src/routes/: Blueprints contendo as rotas da aplicação.
+- Python 3.14+
+- uv (pip install uv)
+- Docker Desktop
+- Prompt de Comando (CMD)
 
-apps/backend/src/db/seed.sql: Script SQL para população inicial do banco.
+## Instruções de Execução
 
-apps/backend/docker-compose.yml: Configuração do serviço PostgreSQL.
+No diretorio apps/backend:
 
-Instruções para Execução (Windows/CMD)
-Siga os passos abaixo para configurar e iniciar o ambiente de desenvolvimento.
+1. copy .env.example .env
 
-1. Navegação
-Acesse a pasta do backend:
+2. docker compose up -d
 
-cd ldw-merge-skills-atv\apps\backend
+3. uv sync --project .
 
-2. Configuração de Variáveis de Ambiente
-Crie o arquivo .env a partir do exemplo:
+4. uv run --project . python main.py
 
-copy .env.example .env
+URLs:
+- API Base: http://localhost:5000
+- Swagger Docs: http://localhost:5000/docs/
+- Health Check: http://localhost:5000/health
 
-3. Infraestrutura de Banco de Dados
-Inicie o container do PostgreSQL (requer Docker Desktop ativo):
+## Endpoints
 
-docker compose up -d
+Base URL: http://localhost:5000/api
 
-Configurações padrão: Host localhost, Porta 5432, Base library_db, Usuário/Senha postgres.
+- Authors: GET/POST /authors, PUT/DELETE /authors/{id}
+- Books: GET/POST /books, PUT/DELETE /books/{id}
+- Members: GET/POST /members, PUT/DELETE /members/{id}
+- Loans: GET/POST /loans, PUT/DELETE /loans/{id}
 
-4. Instalação e Inicialização
-Instale as dependências e rode a API utilizando o gerenciador uv:
+## Solução de Problemas
 
-uv sync --project .
-uv run --project . python main.py
+- Erro can't open file: verifique cd apps\backend
+- Porta 5432 em uso: pare outros Postgres ou altere docker-compose.yml
+- Verifique docker ps para container library_postgres
 
-Endpoints e Documentação
-Swagger UI: http://localhost:5000/docs/
-
-API Base URL: http://localhost:5000/api
-
-Health Check: http://localhost:5000/health
-
-Carga de Dados Inicial (Seed)
-Após a primeira execução da API para criação das tabelas, utilize o comando abaixo para popular o banco:
-
-docker exec -i library_postgres psql -U postgres -d library_db < src\db\seed.sql
-
-Resolução de Problemas
-Erro de arquivo não encontrado: Certifique-se de que o terminal está operando dentro da pasta apps\backend.
-
-Conflito na porta 5432: Verifique se não há outra instância do PostgreSQL rodando localmente fora do Docker.
-
-Falha na conexão: Utilize docker ps para validar se o container library_postgres está com status "Up".
-
-Comandos de Manutenção
-Parar a API: Ctrl + C no terminal em execução.
-
-Parar o banco de dados: docker compose down
-
-Limpar volumes e resetar banco: docker compose down -v
+Licenca: Projeto educacional/demonstracao.
